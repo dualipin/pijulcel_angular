@@ -115,8 +115,11 @@ ipcMain.handle('imprimir-varios-tickets', async (event, ticketsHTML) => {
                             printers[0];
         
         let printOptions = { 
-          silent: true,
-          margins: { marginType: 'none' } 
+          silent: false, // CAMBIADO PARA DEBUG: mostrar el dialogo de impresion
+          margins: { marginType: 'none' },
+          color: false,
+          scaleFactor: 100,
+          pageSize: { width: 80000, height: 300000 } // 80mm ancho x 300mm alto
         };
         if (targetPrinter) {
           printOptions.deviceName = targetPrinter.name;
