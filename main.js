@@ -96,41 +96,61 @@ ipcMain.handle('imprimir-varios-tickets', async (event, ticketsHTML) => {
       });
 
       try {
+        const logStream = require('fs').createWriteStream(path.join(__dirname, 'print_debug.log'), { flags: 'a' });
+        const log = (msg) => {
+          const text = `[${new Date().toISOString()}] ${msg}\n`;
+          console.log(text.trim());
+          logStream.write(text);
+        };
+        log(`--- Iniciando impresion de ${ticketsHTML.length} tickets ---`);
+
         await win.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
+        log(`HTML cargado exitosamente en ventana invisible.`);
 
         let printers = await win.webContents.getPrintersAsync();
-        let targetPrinter = printers.find(p => p.isDefault) ||
-          printers.find(p => p.name.toLowerCase().includes('epson') || p.name.toLowerCase().includes('tm-t20') || p.name.toLowerCase().includes('ribetec') || p.name.toLowerCase().includes('rt-420') || p.name.toLowerCase().includes('pos') || p.name.toLowerCase().includes('termic') || p.name.toLowerCase().includes('ticket')) ||
-          printers[0];
+        log(`Impresoras detectadas: ${printers.map(p => p.name).join(', ')}`);
 
+        let targetPrinter = printers.find(p => p.isDefault) || 
+                            printers.find(p => p.name.toLowerCase().includes('epson') || p.name.toLowerCase().includes('tm-t20') || p.name.toLowerCase().includes('ribetec') || p.name.toLowerCase().includes('rt-420') || p.name.toLowerCase().includes('pos') || p.name.toLowerCase().includes('termic') || p.name.toLowerCase().includes('ticket')) ||
+                            printers[0];
+        
         let printOptions = { 
           silent: true,
           margins: { marginType: 'none' } 
         };
         if (targetPrinter) {
           printOptions.deviceName = targetPrinter.name;
+          log(`Impresora seleccionada: ${targetPrinter.name}`);
+        } else {
+          log(`No se encontro ninguna impresora.`);
         }
 
         try {
+          log(`Enviando a spooler con opciones: ${JSON.stringify(printOptions)}`);
           await win.webContents.print(printOptions);
+          log(`Impresion enviada exitosamente al spooler de Windows.`);
           resolve('ok');
         } catch (printErr) {
+          log(`Error en win.webContents.print: ${printErr.message || printErr}`);
           reject(printErr.message || printErr);
         } finally {
           if (win) {
+            log(`Esperando 3 segundos antes de destruir la ventana para evitar cancelacion...`);
             setTimeout(() => {
               if (!win.isDestroyed()) {
                 win.close();
+                log(`Ventana de impresion destruida.`);
               }
             }, 3000);
           }
+          logStream.end();
         }
 
       } catch (err) {
+        require('fs').appendFileSync(path.join(__dirname, 'print_debug.log'), `[${new Date().toISOString()}] Error fatal general: ${err.message || err}\n`);
         reject(err);
         if (win) {
-          win.close();
-          win = null;
+          if(!win.isDestroyed()) win.close();
         }
       }
     });
