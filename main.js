@@ -103,7 +103,10 @@ ipcMain.handle('imprimir-varios-tickets', async (event, ticketsHTML) => {
           printers.find(p => p.name.toLowerCase().includes('epson') || p.name.toLowerCase().includes('tm-t20') || p.name.toLowerCase().includes('ribetec') || p.name.toLowerCase().includes('rt-420') || p.name.toLowerCase().includes('pos') || p.name.toLowerCase().includes('termic') || p.name.toLowerCase().includes('ticket')) ||
           printers[0];
 
-        let printOptions = { silent: true };
+        let printOptions = { 
+          silent: true,
+          margins: { marginType: 'none' } 
+        };
         if (targetPrinter) {
           printOptions.deviceName = targetPrinter.name;
         }
@@ -115,8 +118,11 @@ ipcMain.handle('imprimir-varios-tickets', async (event, ticketsHTML) => {
           reject(printErr.message || printErr);
         } finally {
           if (win) {
-            win.close();
-            win = null;
+            setTimeout(() => {
+              if (!win.isDestroyed()) {
+                win.close();
+              }
+            }, 3000);
           }
         }
 
