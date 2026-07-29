@@ -108,15 +108,17 @@ ipcMain.handle('imprimir-varios-tickets', async (event, ticketsHTML) => {
           printOptions.deviceName = targetPrinter.name;
         }
 
-        win.webContents.print(printOptions, (success, errorType) => {
-          if (!success) {
-            reject(errorType);
-          } else {
-            resolve('ok');
+        try {
+          await win.webContents.print(printOptions);
+          resolve('ok');
+        } catch (printErr) {
+          reject(printErr.message || printErr);
+        } finally {
+          if (win) {
+            win.close();
+            win = null;
           }
-          win.close();
-          win = null;
-        });
+        }
 
       } catch (err) {
         reject(err);
