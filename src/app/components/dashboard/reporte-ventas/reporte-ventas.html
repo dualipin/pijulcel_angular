@@ -1,0 +1,106 @@
+<main class="container my-4">
+
+  <div
+    class="bg-white border-bottom px-4 py-3 d-flex flex-wrap justify-content-between align-items-center shadow-sm rounded">
+
+    <!-- Título y rango -->
+    <div class="mb-2 mb-sm-0">
+      <h5 class="mb-1 text-dark fw-bold">Resumen de ventas</h5>
+      <div class="text-dark small">{{ rangoResumen }}</div>
+    </div>
+
+    <!-- Totales -->
+    <div class="d-flex flex-wrap text-end" style="gap: 4vh;">
+
+      <!-- Hoy -->
+      <div class="d-flex flex-column align-items-center">
+        <small class="text-muted">Hoy</small>
+        <span class="fw-bold text-success fs-6">
+          <i class="bi bi-calendar-day me-1"></i>
+          {{ resumenVentas.dia | currency:'MXN':'symbol':'1.2-2' }}
+        </span>
+      </div>
+
+      <!-- Semana -->
+      <div class="d-flex flex-column align-items-center">
+        <small class="text-muted">Semana</small>
+        <span class="fw-bold text-primary fs-6">
+          <i class="bi bi-calendar-week me-1"></i>
+          {{ resumenVentas.semana | currency:'MXN':'symbol':'1.2-2' }}
+        </span>
+      </div>
+
+      <!-- Mes -->
+      <div class="d-flex flex-column align-items-center">
+        <small class="text-muted">Mes</small>
+        <span class="fw-bold text-dark fs-6">
+          <i class="bi bi-calendar3 me-1"></i>
+          {{ resumenVentas.mes | currency:'MXN':'symbol':'1.2-2' }}
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="card shadow-sm">
+
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center flex-wrap">
+      <h5 class="mb-0">📋 Ventas realizadas</h5>
+
+      <div class="dropdown">
+        <button class="btn btn-outline-light dropdown-toggle btn-filtro" type="button" data-bs-toggle="dropdown"
+          aria-expanded="false">
+          {{ filtroFecha }}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" (click)="aplicarFiltro('Siempre')">Siempre</a></li>
+          <li><a class="dropdown-item" (click)="aplicarFiltro('Hoy')">Hoy</a></li>
+          <li><a class="dropdown-item" (click)="aplicarFiltro('Ayer')">Ayer</a></li>
+          <li><a class="dropdown-item" (click)="aplicarFiltro('Semana')">Esta semana</a></li>
+        </ul>
+      </div>
+    </div>
+
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Fecha y Hora</th>
+            <th>Descuento</th>
+            <th>Total</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of ventasFiltradas">
+            <td>{{ item.venta.fechaHora | date: 'dd/MM/yyyy HH:mm:ss a' }}</td>
+            <td>
+              {{
+              item.venta.descuentoAplicado
+              | currency : "MXN" : "symbol" : "1.2-2"
+              }}
+            </td>
+            <td class="fw-bold">
+              {{
+              item.venta.totalVenta
+              | currency : "MXN" : "symbol" : "1.2-2"
+              }}
+            </td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-outline-primary" (click)="reimprimirTicket(item)">
+                <i class="bi bi-printer-fill me-1"></i> Reimprimir
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="ventas.length === 0">
+            <td colspan="4" class="text-center text-muted py-4">
+              No hay ventas registradas
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>

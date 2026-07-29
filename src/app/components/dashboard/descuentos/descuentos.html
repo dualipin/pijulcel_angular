@@ -1,0 +1,227 @@
+<main>
+
+  <div class="container py-4 px-5 rounded shadow-sm bg-light">
+    <div class="mb-4 border-bottom pb-2">
+      <h4 class="fw-bold text-primary">🛒 Control de Descuentos</h4>
+    </div>
+    <form [formGroup]="this.formDescuento" (ngSubmit)="onSubmit()">
+      <!-- Estiliza cada grupo -->
+      <div class="row g-3">
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Tipo de descuento</label>
+          <select class="form-select" name="tipoDescuento" formControlName="tipoDescuento">
+            <option value="1">Porcentaje (%)</option>
+            <!--<option value="2">Monto fijo ($)</option>-->
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Aplicar descuento por:</label>
+          <select class="form-select" name="tipoAplicacion" (change)="cambiarTipoApp()"
+            formControlName="tipoAplicacion">
+            <option value="2">Categoría</option>
+            <option value="3">Marca</option>
+            <option value="1">Producto</option>
+          </select>
+        </div>
+
+
+      </div>
+
+      <div class="row g-3 mt-3">
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Valor del descuento</label>
+          <input type="number" class="form-control" placeholder="Escanea o escribe el código" name="valor"
+            formControlName="valor" />
+        </div>
+
+        <div class="col-md-6" *ngIf="this.formDescuento.get('tipoAplicacion')?.value == 1">
+          <label class="form-label fw-semibold">Código de barra</label>
+          <input type="text" class="form-control" placeholder="Escanea o escribe el código" name="producto_id"
+            formControlName="producto_id" (input)="valiateQR()" />
+          <button class="btn btn-success mt-1" type="button"
+            *ngIf="(this.formDescuento.get('validarQR')?.value) === null" (click)="confirmProducto()">Validar</button>
+          <button class="btn btn-secondary mt-1" type="button"
+            *ngIf="(this.formDescuento.get('validarQR')?.value) === 'true'" (click)="confirmProducto()">Volver a
+            validar</button>
+        </div>
+
+        <div class="col-md-6" *ngIf="this.formDescuento.get('tipoAplicacion')?.value == 2">
+          <label class="form-label fw-semibold">Selecciona la categoría</label>
+          <select class="form-select" name="categoria_id" formControlName="categoria_id">
+            <option *ngFor="let categoria of categorias" [value]="categoria.id">{{ categoria.nombre }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-6" *ngIf="this.formDescuento.get('tipoAplicacion')?.value == 3">>
+          <label class="form-label fw-semibold">Selecciona la marca</label>
+          <select class="form-select" name="marca_id" formControlName="marca_id">
+            <option *ngFor="let marca of marcas" [ngValue]="marca.id">{{ marca.nombre }}</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Agrupación y borde -->
+      <div class="row mt-5 p-3 bg-white border rounded">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">¿Cuándo aplicar el descuento?</label>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="publicNow" formControlName="publicNow" value="true" />
+            <label class="form-check-label" for="inmediato">Inmediatamente</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="publicNow" formControlName="publicNow" value="false" />
+            <label class="form-check-label" for="programado">Programado</label>
+          </div>
+
+          <div *ngIf="this.formDescuento.get('publicNow')?.value == 'false'" class="mt-3">
+            <label class="form-label">Fecha de inicio</label>
+            <input type="date" class="form-control" name="fechaInicio" [min]="hoy" formControlName="fechaInicio" />
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">¿Finaliza el descuento?</label>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="IsIndefinided" formControlName="IsIndefinided"
+              value="false" (click)="this.formDescuento.controls['fechaFinal'].setValue(null);" />
+            <label class="form-check-label" for="siFinaliza">Sí</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="finaliza" name="IsIndefinided"
+              formControlName="IsIndefinided" value="true"
+              (click)="this.formDescuento.controls['fechaFinal'].setValue(this.hoy);" />
+            <label class="form-check-label" for="noFinaliza">Indefinido</label>
+          </div>
+
+          <div *ngIf="this.formDescuento.get('IsIndefinided')?.value == 'false'" class="mt-3">
+            <label class="form-label">Fecha de finalización</label>
+            <input type="date" class="form-control" name="fechaFinal"
+              [min]="this.formDescuento.get('fechaInicio')?.value" formControlName="fechaFinal" />
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 text-center">
+        <button class="btn btn-success px-4" type="submit" [disabled]="formDescuento.invalid || isSubmit">
+          <span *ngIf="isSubmit" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          {{ isSubmit ? '' : 'Guardar' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="table-responsive p-5">
+    <div class="dropdown">
+      <button class="btn btn-dark dropdown-toggle btn-filtro text-light" type="button" data-bs-toggle="dropdown"
+        aria-expanded="false" style="border: 1px solid #555;">
+        Filtrar por
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end bg-secondary text-light" style="border: 1px solid #444;">
+        <li><a class="dropdown-item text-light" (click)="filtrarBy = 0" style="background-color: transparent;">Todo</a>
+        </li>
+        <li><a class="dropdown-item text-light" (click)="filtrarBy = 1"
+            style="background-color: transparent;">Productos</a></li>
+        <li><a class="dropdown-item text-light" (click)="filtrarBy = 2"
+            style="background-color: transparent;">Marcas</a></li>
+        <li><a class="dropdown-item text-light" (click)="filtrarBy = 3"
+            style="background-color: transparent;">Categorías</a></li>
+      </ul>
+    </div>
+
+    <div style="max-height: 390px; overflow: auto;">
+      <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Estado</th>
+            <th>Tipo</th>
+            <th>Detalle</th>
+            <th>Valor</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Descuentos por producto -->
+
+          <ng-container *ngIf="filtrarBy === 0 || filtrarBy === 1">
+            <tr *ngFor="let item of listDesProd">
+              <td class="text-center" style="color: white; font-weight: bold; background-color: brown;"
+                *ngIf="item.config.estado === 'Vencido'">{{item.config.estado}}</td>
+              <td class="text-center" style="color: white; font-weight: bold; background-color: rgb(42, 61, 165);"
+                *ngIf="item.config.estado === 'Programado'">{{item.config.estado}}</td>
+              <td class="text-center" style="color: white; font-weight: bold; background-color: rgb(42, 165, 89);"
+                *ngIf="item.config.estado === 'Activo'">{{item.config.estado}}</td>
+              <td>Producto</td>
+              <td class="d-flex" style="align-items: center; gap: 8px;">
+                <div>
+                  <img class="imagen-producto" [src]="this.url_store + item.producto.imagen">
+                </div>
+                <div>
+                  <strong>{{ item.producto.nombre }}</strong><br>
+                  Marca: {{ item.producto.marca.nombre }}<br>
+                  Categoría: {{ item.producto.categoria.nombre }}
+                </div>
+              </td>
+              <td>{{ item.config.valor }}{{ item.config.tipoDescuento === 1 ? '%' : ' MXN' }}</td>
+              <td>{{ item.config.fechaInicio | date:'dd-MM-yyyy' }}</td>
+              <td>{{ item.config.fechaFin ? (item.config.fechaFin | date:'dd-MM-yyyy') : 'Indefinido' }}</td>
+              <td class="text-center" style="justify-content: center; align-items: center;"><button type="button"
+                  class="btn btn-danger" (click)="deleteDescuento(item.config.id, 1)">Eliminar</button></td>
+            </tr>
+          </ng-container>
+
+          <!-- Descuentos por marca -->
+          <ng-container *ngIf="filtrarBy === 0 || filtrarBy === 2">
+            <tr *ngFor="let item of listDesMarc">
+              <td class="text-center" style="color: white; font-weight: bold; background-color: brown;"
+                *ngIf="item.config.estado === 'Vencido'">{{item.config.estado}}</td>
+              <td class="text-center" style="color: white; font-weight: bold; background-color: rgb(42, 61, 165);"
+                *ngIf="item.config.estado === 'Programado'">{{item.config.estado}}</td>
+              <td class="text-center" style="color: white; font-weight: bold; background-color: rgb(42, 165, 89);"
+                *ngIf="item.config.estado === 'Activo'">{{item.config.estado}}</td>
+              <td>Marca</td>
+              <td>{{ item.marca.nombre }}</td>
+              <td>{{ item.config.valor }}{{ item.config.tipoDescuento === 1 ? '%' : ' MXN' }}</td>
+              <td>{{ item.config.fechaInicio | date:'dd-MM-yyyy' }}</td>
+              <td>{{ item.config.fechaFin ? (item.config.fechaFin | date:'dd-MM-yyyy') : 'Indefinido' }}</td>
+              <td class="text-center"><button type="button" class="btn btn-danger"
+                  (click)="deleteDescuento(item.config.id, 3)">Eliminar</button></td>
+            </tr>
+          </ng-container>
+
+          <!-- Descuentos por categoría -->
+          <ng-container *ngIf="filtrarBy === 0 || filtrarBy === 3">
+            <tr *ngFor="let item of listDesCateg">
+              <td class="text-center" style="color: white; font-weight: bold; background-color: brown;"
+                *ngIf="item.config.estado === 'Vencido'">{{item.config.estado}}</td>
+              <td class="text-center" style="color: white; font-weight: bold; background-color: rgb(42, 61, 165);"
+                *ngIf="item.config.estado === 'Programado'">{{item.config.estado}}</td>
+              <td class="text-center" style="color: white; font-weight: bold; background-color: rgb(42, 165, 89);"
+                *ngIf="item.config.estado === 'Activo'">{{item.config.estado}}</td>
+              <td>Categoría</td>
+              <td>{{ item.categoria.nombre }}</td>
+              <td>{{ item.config.valor }}{{ item.config.tipoDescuento === 1 ? '%' : ' MXN' }}</td>
+              <td>{{ item.config.fechaInicio | date:'dd-MM-yyyy' }}</td>
+              <td>{{ item.config.fechaFin ? (item.config.fechaFin | date:'dd-MM-yyyy') : 'Indefinido' }}</td>
+              <td class="text-center">
+                <button type="button" class="btn btn-danger" [disabled]="isDelete"
+                  (click)="deleteDescuento(item.config.id, 2)">
+                  <span *ngIf="isDelete" class="spinner-border spinner-border-sm me-2" role="status"
+                    aria-hidden="true"></span>
+                  {{ isDelete ? '' : 'Eliminar' }}</button>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+</main>

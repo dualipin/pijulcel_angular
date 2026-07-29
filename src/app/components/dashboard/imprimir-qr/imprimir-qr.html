@@ -1,0 +1,146 @@
+<main class="container-fluid vh-100 d-flex flex-column bg-light p-0 overflow-hidden">
+
+  <!-- Cabecera y Buscador -->
+  <div class="p-3 p-md-4 pb-2 bg-white shadow-sm z-2">
+    <!-- Header -->
+    <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center mb-3">
+      <div class="flex-grow-1 me-md-4">
+        <input type="text" class="form-control form-control-lg bg-light" placeholder="Buscar un producto..." 
+          (input)="change($event)" [(ngModel)]="searchBar" />
+      </div>
+      <button type="button" class="btn btn-dark btn-lg text-nowrap" (click)="searchByQR()">
+        <i class="bi bi-upc-scan me-2"></i>Código de barra
+      </button>
+    </div>
+
+    <!-- Category Menu -->
+    <div class="d-flex overflow-x-auto gap-2 pb-2 text-nowrap">
+      <button class="btn rounded-pill px-4" 
+        [ngClass]="activeCategory === 'Todo' ? 'btn-dark' : 'btn-outline-secondary'"
+        (click)="setActiveCategory('Todo')">
+        Todo
+      </button>
+      <button *ngFor="let category of categories" class="btn rounded-pill px-4"
+        [ngClass]="activeCategory === category.nombre ? 'btn-dark' : 'btn-outline-secondary'" 
+        (click)="setActiveCategory(category.nombre)">
+        {{ category.nombre }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenedor Principal (Productos y Tickets) -->
+  <div class="d-flex flex-column flex-lg-row flex-grow-1 overflow-hidden">
+
+    <!-- Sección de Productos -->
+    <div class="flex-grow-1 p-3 p-md-4 overflow-y-auto h-100">
+      <div class="row g-3 g-md-4">
+        
+        <!-- Product Card como Botón para accesibilidad nativa -->
+        <div class="col-12 col-sm-6 col-md-4" *ngFor="let producto of vista">
+          <button type="button" class="card h-100 w-100 text-start shadow-sm border-0 text-decoration-none" 
+            (click)="addCart(producto)">
+            
+            <div class="card-body p-3 d-flex flex-column">
+              <!-- Imagen -->
+              <div class="text-center bg-white rounded mb-3">
+                <img [src]="url_store + producto.imagen" class="img-fluid object-fit-contain" alt="Producto">
+              </div>
+
+              <!-- Contenedor de Info y Precio -->
+              <div class="border rounded p-3 bg-light mt-auto d-flex flex-column">
+                <h6 class="text-truncate fw-bold mb-3" [title]="producto.nombre">{{ producto.nombre }}</h6>
+                
+                <!-- Sección de Código de Barras -->
+                <div class="bg-white border rounded p-2 mb-3 text-center d-flex flex-column align-items-center justify-content-center">
+                  <svg [id]="'bc_' + producto.codigoQr" class="img-fluid mb-1"></svg>
+                  <span class="small text-muted fw-bold">{{ generateQR(producto) }}</span>
+                </div>
+
+                <!-- Precios -->
+                <div class="d-flex justify-content-between align-items-center mt-auto border-top pt-2">
+                  <span class="text-secondary small fw-bold">Precio:</span>
+                  <div class="text-end">
+                    <span class="text-dark fw-bold fs-5" *ngIf="!producto.nuevoPrecio">
+                      {{ producto.precioVenta | currency:'MXN':'symbol':'1.2-2' }}
+                    </span>
+                    <span class="text-muted text-decoration-line-through small me-2" *ngIf="producto.nuevoPrecio">
+                      {{ producto.precioVenta | currency:'MXN':'symbol':'1.2-2' }}
+                    </span>
+                    <span class="text-danger fw-bold fs-5" *ngIf="producto.nuevoPrecio">
+                      {{ producto.nuevoPrecio | currency:'MXN':'symbol':'1.2-2' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+            </div>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sidebar derecho: Tickets -->
+    <div class="col-12 col-lg-4 col-xl-3 bg-white border-start shadow-sm d-flex flex-column h-100 z-3">
+      
+      <!-- Encabezado de los tickets -->
+      <div class="p-3 border-bottom bg-light d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-printer me-2"></i>Listos para imprimir</h5>
+        <span class="badge bg-dark rounded-pill">{{ carrito.length }}</span>
+      </div>
+
+      <!-- Lista de productos en el carrito -->
+      <div class="p-3 overflow-y-auto flex-grow-1">
+        
+        <!-- Estado Vacío -->
+        <div *ngIf="carrito.length === 0" class="text-center text-muted mt-5">
+          <p>No hay tickets pendientes</p>
+        </div>
+
+        <div *ngFor="let item of carrito" class="d-flex align-items-center mb-3 pb-3 border-bottom">
+          <img [src]="url_store + item.producto.imagen" alt="producto" class="img-fluid rounded me-3 object-fit-cover shadow-sm" width="60">
+
+          <div class="flex-grow-1 overflow-hidden">
+            <h6 class="mb-1 text-truncate" [title]="item.producto.nombre">{{ item.producto.nombre }}</h6>
+            
+            <div class="row align-items-center g-2 mt-1">
+              <!-- Precios -->
+              <div class="col">
+                <span class="fw-bold d-block" *ngIf="!item.producto.nuevoPrecio">
+                  {{ item.producto.precioVenta | currency:'MXN':'symbol':'1.2-2' }}
+                </span>
+                <div *ngIf="item.producto.nuevoPrecio">
+                  <span class="fw-bold text-danger d-block">
+                    {{ item.producto.nuevoPrecio | currency:'MXN':'symbol':'1.2-2' }}
+                  </span>
+                  <small class="text-muted text-decoration-line-through">
+                    {{ item.producto.precioVenta | currency:'MXN':'symbol':'1.2-2' }}
+                  </small>
+                </div>
+              </div>
+
+              <!-- Input Cantidad usando Grid en lugar de ancho fijo -->
+            </div>
+            <div class="">
+              <input type="number" [(ngModel)]="item.cantidad" class="form-control text-center fw-bold" min="1">
+            </div>
+          </div>
+
+          <!-- Botón Eliminar -->
+          <button class="btn btn-outline-danger btn-sm ms-3" (click)="removeFromCart(item)" title="Eliminar">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Resumen / Botón de Acción -->
+      <div class="p-3 border-top bg-light mt-auto">
+        <button class="btn btn-success btn-lg w-100 fw-bold shadow-sm" (click)="imprimirTickets()" [disabled]="carrito.length <= 0">
+          <i class="bi bi-printer-fill me-2"></i>Imprimir tickets
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</main>

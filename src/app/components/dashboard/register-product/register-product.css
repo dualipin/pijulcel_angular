@@ -1,0 +1,41 @@
+.codeQR {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  border: 2px solid rgb(192, 192, 192);
+  border-radius: 5px;
+}
+
+.product-card {
+  border-radius: 15px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.veg-badge,
+.non-veg-badge {
+  font-size: 0.75rem;
+  padding: 3px 6px;
+  border-radius: 5px;
+  color: white;
+}
+
+.veg-badge {
+  background-color: #00b67a;
+}
+
+.responsive-img {
+  width: 100%;
+  height: auto;
+  max-height: 350px; /* puedes ajustar este límite según tu diseño */
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+main {
+  height: 100vh;
+  overflow-y: auto;
+}

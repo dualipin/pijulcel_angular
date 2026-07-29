@@ -1,0 +1,97 @@
+a {
+  text-decoration: none;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+
+
+.sam-form-field {
+  position: relative;
+  font-family: Arial, sans-serif;
+  margin: 1%;
+  border-radius: 4px;
+  min-height: 85px;
+  margin-top: 50px;
+}
+
+.input-container {
+  position: relative;
+}
+
+.sam-form-field input, .sam-form-field textarea, .sam-form-field select {
+  width: 100%;
+  padding: 12px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 18px;
+  outline: none;
+  color: #000000;
+  transition: all 0.3s ease-in-out;
+  background: #85909118;
+  margin-top: 0px;
+  height: 60px;
+}
+
+.sam-form-field textarea {
+  font-size: small;
+}
+
+.sam-form-field label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%; /* Por defecto, el label estará centrado */
+  left: 10px;
+  transform: translateY(-100%);
+  font-size: 16px;
+  color: #001c7a69;
+  padding: 0 1vh;
+  transition: all 0.3s ease-in-out;
+  pointer-events: none;
+  mat-icon, svg {
+    transition: 0.3s;
+    color: #001c7a69;
+    margin-right: 5px;
+  }
+  svg {
+    fill: #001c7a69;
+  }
+}
+
+/* Efecto cuando el input está enfocado o tiene texto */
+.sam-form-field input:focus + label, textarea:focus + label,
+.sam-form-field input:not(:placeholder-shown) + label, textarea:not(:placeholder-shown) + label {
+  top: 0;
+  font-size: 12px;
+  color: #001D7A; /* Azul de Angular Material */
+  mat-icon, svg {
+    transition: 0.3s;
+    scale: 0.8;
+    color: #001D7A;
+  }
+  svg {
+    fill: #001D7A;
+  }
+}
+
+.sam-form-field input:focus, select:focus {
+  border: 2px solid #0095ff7b;
+}
+
+.sam-form-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Columnas automáticas */
+  width: 100%;
+}
+
+mat-error {
+  font-size: 10px;
+  color: rgb(174, 0, 0);
+  margin-top: 4px;  /* Asegura que el mat-error no interfiere con el label */
+}

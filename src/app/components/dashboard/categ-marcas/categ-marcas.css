@@ -1,0 +1,24 @@
+.categoria-pill {
+  background-color: #e2e6ea;
+  transform: scale(1.03);
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease-in-out;
+  cursor: default;
+}
+
+.categoria-pill-2 {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.remove_modelo:hover {
+  cursor: pointer;
+  scale: 1.05;
+}
+
+main {
+  height: 100vh;
+  overflow-y: auto;
+}

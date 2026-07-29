@@ -1,0 +1,53 @@
+
+.sidebar {
+  width: 360px;
+  height: 100vh;
+  position: relative;
+  background-color: #343a40;
+  color: white;
+  padding-top: 20px;
+  overflow-y: auto;
+}
+main {
+  display: flex;
+}
+
+.sidebar a {
+  color: white;
+  text-decoration: none;
+}
+
+.nav-link {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  padding-left: 25px;
+}
+
+.sidebar .nav-link:hover {
+  background-color: #495057;
+  border-radius: 5px;
+}
+.h_lbl {
+  margin-top: 19px;
+  margin-bottom: 5px;
+  color: gray;
+}
+
+.lbl_sidebar {
+  margin-left: 16px;
+}
+
+.lbl_sidebar:hover {
+  cursor: pointer;
+}
+
+
+
+.bodyContent {
+  width: 100%;
+  background-color: #f8f9fa;
+  overflow: hidden;
+  height: 100vh;
+}

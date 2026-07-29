@@ -1,0 +1,148 @@
+main {
+  background-image: url("./assets/fondo_login.png");
+  background-size: cover;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.logo {
+  height: 12rem; /* similar a 150px */
+  max-width: 100%;
+}
+
+.mainContainer {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.658);
+  color: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#nameEmp {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+#desc {
+  color: gray;
+  font-size: 0.75rem;
+}
+
+.leftCont, .rightCont {
+  width: 50%;
+}
+
+.leftCont {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.rightCont {
+  background-color: black;
+  padding: 2%;
+  box-sizing: border-box;
+}
+
+.initSesion {
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+.inpt_user, .inpt_pass {
+  margin-top: 0.5rem;
+  color: aliceblue;
+  padding: 0.5rem;
+  background-color: rgba(97, 97, 97, 0.374);
+  border-radius: 5px;
+  border: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.inpt_user:hover, .inpt_pass:hover {
+  border: 1px solid white;
+}
+
+.formLogin {
+  padding: 0.5rem;
+}
+
+.lbl_pass {
+  margin-top: 1.5rem;
+  display: block;
+}
+
+.btn_Login {
+  background-color: aliceblue;
+  margin-top: 1.5rem;
+  padding: 0.5rem 2rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .mainContainer {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .leftCont, .rightCont {
+    width: 100%;
+  }
+
+  .logo {
+    height: 8rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  #nameEmp {
+    font-size: 1rem;
+  }
+
+  .initSesion h2 {
+    font-size: 1.2rem;
+  }
+
+  .btn_Login {
+    width: 100%;
+    padding: 0.75rem;
+  }
+}
+
+
+.sam-form-field input {
+  border: 1px solid #ccc;
+  color: #eeedff;
+  background: #85909118;
+}
+
+.sam-form-field label {
+  color: #b7b7b769;
+  svg {
+    fill: #d9d9d994;
+  }
+}
+
+/* Efecto cuando el input está enfocado o tiene texto */
+.sam-form-field input:focus + label,
+.sam-form-field input:not(:placeholder-shown) + label {
+  color: #e5e5e5; /* Azul de Angular Material */
+  svg {
+    fill: #f8f8f8;
+  }
+}
+
+.sam-form-field input:focus {
+  border: 2px solid #ffffff7b;
+}

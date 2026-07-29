@@ -1,0 +1,205 @@
+Table "categorias" {
+  "id" int [pk, not null, increment]
+  "nombre" varchar(50) [unique, note: 'Display, Batería, etc']
+}
+
+Table "descuentos_categoria" {
+  "id" int [pk, not null, increment]
+  "categ_id" int [not null]
+  "config_id" int [not null]
+
+  Indexes {
+    categ_id [type: btree, name: "categ_id"]
+    config_id [type: btree, name: "config_id"]
+  }
+}
+
+Table "descuentos_config" {
+  "id" int [pk, not null, increment]
+  "tipo_descuento" int [not null, note: '1 = porcentaje, 2 = monto_fijo']
+  "valor" double [not null, note: '10 si es 10%, 50 si son $50']
+  "tipo_aplicacion" int
+  "fecha_inicio" date
+  "fecha_fin" date
+}
+
+Table "descuentos_marca" {
+  "id" int [pk, not null, increment]
+  "marca_id" int [not null]
+  "config_id" int [not null]
+
+  Indexes {
+    config_id [type: btree, name: "config_id"]
+    marca_id [type: btree, name: "marca_id"]
+  }
+}
+
+Table "descuentos_producto" {
+  "id" int [pk, not null, increment]
+  "producto_id" varchar(50)
+  "config_id" int [not null]
+
+  Indexes {
+    config_id [type: btree, name: "idx_config_id"]
+    producto_id [type: btree, name: "idx_producto_id"]
+  }
+}
+
+Table "detalles_venta" {
+  "id" int [pk, not null, increment]
+  "venta_id" int [not null]
+  "producto_id" varchar(50) [not null]
+  "cantidad" int [not null]
+  "precio_unit" double [not null]
+  "descuento" double [default: 0]
+  "subtotal" double [not null]
+
+  Indexes {
+    producto_id [type: btree, name: "producto_id"]
+    venta_id [type: btree, name: "venta_id"]
+  }
+}
+
+Table "devoluciones" {
+  "id" int [pk, not null, increment]
+  "usuario_id" varchar(50) [not null]
+  "producto_id" varchar(50) [not null]
+  "venta_id" int [not null]
+  "cantidad" int [not null]
+  "monto_reembolsado" double [not null]
+  "motivo" text [not null, note: 'Ej. Falla, no era compatible, etc.']
+  "fecha_hora" datetime [not null]
+
+  Indexes {
+    producto_id [type: btree, name: "producto_id"]
+    usuario_id [type: btree, name: "usuario_id"]
+    venta_id [type: btree, name: "venta_id"]
+  }
+}
+
+Table "entradas_producto" {
+  "id" int [pk, not null, increment]
+  "usuario_id" varchar(50)
+  "producto_id" varchar(50) [not null]
+  "cantidad" int [not null]
+  "precio_compra" double [not null]
+  "fecha_hora" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "observ" varchar(255)
+
+  Indexes {
+    producto_id [type: btree, name: "producto_id"]
+    usuario_id [type: btree, name: "usuario_id"]
+  }
+}
+
+Table "marcas" {
+  "id" int [pk, not null, increment]
+  "nombre" varchar(100) [unique, note: 'Motorola, Samsung, etc.']
+}
+
+Table "modelos" {
+  "id" int [pk, not null, increment]
+  "nombre" varchar(100) [not null]
+  "marca_id" int [not null]
+}
+
+Table "negocios" {
+  "id" int [pk, not null, increment]
+  "nombre" varchar(250) [unique, not null]
+  "rfc" varchar(20) [unique, not null]
+  "direccion" varchar(250)
+  "telefono" varchar(30) [unique, not null]
+  "logo_path" varchar(250) [unique, not null]
+}
+
+Table "productos" {
+  "codigo_qr" varchar(50) [pk, not null]
+  "imagen" varchar(250) [not null]
+  "nombre" varchar(150) [not null]
+  "marca_id" int [not null]
+  "modelo_id" int [not null]
+  "categ_id" int [not null]
+  "precio_venta" double [not null]
+  "stock" int [not null]
+  "stock_minimo" int [not null]
+  "estado" int [not null, default: 1, note: '"1 = Activo"']
+
+  Indexes {
+    categ_id [type: btree, name: "categ_id"]
+    marca_id [type: btree, name: "marca_id"]
+  }
+}
+
+Table "tickets" {
+  "folio" varchar(50) [pk, not null]
+  "venta_id" int [not null]
+  "negocio_id" int [not null]
+
+  Indexes {
+    negocio_id [type: btree, name: "negocio_id"]
+    venta_id [type: btree, name: "venta_id"]
+  }
+}
+
+Table "usuarios" {
+  "username" varchar(50) [pk, not null]
+  "password" varchar(30) [not null]
+  "rol" varchar(1) [not null, note: '0 = Cajero, 1 = Admin']
+  "activo" tinyint(1) [default: 1]
+}
+
+Table "ventas" {
+  "id" int [pk, not null, increment]
+  "usuario_id" varchar(50)
+  "fecha_hora" datetime [not null]
+  "subtotal" double [not null, note: 'Suma de los subtotales sin impuestos ni descuentos']
+  "descuento_aplicado" double [default: 0, note: 'Monto total de descuento aplicado']
+  "impuesto_aplicado" double [default: 0, note: 'Monto total de impuestos']
+  "total_venta" double [not null, note: 'subtotal - descuento + impuesto']
+  "metodo_pago" varchar(50) [not null]
+  "observ" text
+
+  Indexes {
+    usuario_id [type: btree, name: "usuario_id"]
+  }
+}
+
+Ref "descuento_categoria_ibfk_1":"categorias"."id" < "descuentos_categoria"."categ_id" [update: cascade, delete: cascade]
+
+Ref "descuento_categoria_ibfk_2":"descuentos_config"."id" < "descuentos_categoria"."config_id" [update: cascade, delete: cascade]
+
+Ref "descuento_marca_ibfk_1":"marcas"."id" < "descuentos_marca"."marca_id" [update: cascade, delete: cascade]
+
+Ref "descuento_marca_ibfk_2":"descuentos_config"."id" < "descuentos_marca"."config_id" [update: cascade, delete: cascade]
+
+Ref "fk_descuentos_producto_config":"descuentos_config"."id" < "descuentos_producto"."config_id" [update: cascade, delete: cascade]
+
+Ref "fk_descuentos_producto_producto":"productos"."codigo_qr" < "descuentos_producto"."producto_id" [update: cascade, delete: cascade]
+
+Ref "venta_producto_ibfk_1":"ventas"."id" < "detalles_venta"."venta_id"
+
+Ref "venta_producto_ibfk_2":"productos"."codigo_qr" < "detalles_venta"."producto_id"
+
+Ref "devoluciones_ibfk_1":"usuarios"."username" < "devoluciones"."usuario_id"
+
+Ref "devoluciones_ibfk_2":"productos"."codigo_qr" < "devoluciones"."producto_id"
+
+Ref "devoluciones_ibfk_3":"ventas"."id" < "devoluciones"."venta_id"
+
+Ref "entradas_producto_ibfk_1":"usuarios"."username" < "entradas_producto"."usuario_id" [update: cascade, delete: set null]
+
+Ref "entradas_producto_ibfk_2":"productos"."codigo_qr" < "entradas_producto"."producto_id" [update: cascade, delete: cascade]
+
+Ref "FK_modelos_marcas":"marcas"."id" < "modelos"."marca_id" [update: cascade, delete: cascade]
+
+Ref "FK_producto_categoria":"categorias"."id" < "productos"."categ_id"
+
+Ref "FK_producto_marca":"marcas"."id" < "productos"."marca_id"
+
+Ref "FK_productos_modelos":"modelos"."id" < "productos"."modelo_id"
+
+Ref "FK_tickets_negocio":"negocios"."id" < "tickets"."negocio_id" [delete: cascade]
+
+Ref "tickets_ibfk_1":"ventas"."id" < "tickets"."venta_id" [delete: cascade]
+
+Ref "ventas_ibfk_1":"usuarios"."username" < "ventas"."usuario_id" [delete: set null]

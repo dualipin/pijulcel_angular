@@ -1,0 +1,16 @@
+.imagen-producto {
+  width: auto;
+  height: 60px;
+  max-height: max-content; /* puedes ajustar este límite según tu diseño */
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+th {
+  align-items: center;
+}
+
+main {
+  height: 100vh;
+  overflow-y: auto;
+}

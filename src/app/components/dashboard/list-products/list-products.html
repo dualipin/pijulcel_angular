@@ -1,0 +1,210 @@
+<main class="container-fluid vh-100 p-0 overflow-hidden">
+  <div class="row g-0 h-100">
+    
+    <!-- Panel Principal (Productos) -->
+    <div class="col-12 d-flex flex-column p-3 p-md-4 bg-light overflow-hidden h-100" [class.col-lg-9]="!isAdmin && !showNav">
+    
+    <!-- Header -->
+    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
+      <button class="btn btn-outline-secondary" (click)="hiddenSideBar()">
+        <i class="bi bi-list"></i>
+      </button>
+      
+      <input type="text" class="form-control flex-grow-1 w-auto mx-md-3" placeholder="Buscar un producto..." 
+        (input)="change($event)" [(ngModel)]="searchBar" />
+      
+      <button type="button" class="btn btn-dark text-nowrap" (click)="searchByQR()">
+        <i class="bi bi-upc-scan me-1"></i> Código de barra
+      </button>
+
+      <button type="button" class="btn btn-outline-success text-nowrap" (click)="exportLowStockCSV()">
+        <i class="bi bi-download me-1"></i> Exportar CSV
+      </button>
+    </div>
+
+    <!-- Category Menu & Filters -->
+    <div class="row g-3 mb-4 align-items-center">
+      <!-- Menú de categorías con scroll horizontal -->
+      <div class="col-12 col-md d-flex gap-2 overflow-x-auto text-nowrap pb-2">
+        <button class="btn btn-outline-dark rounded-pill" 
+          [ngClass]="{ active: activeCategory === 'Todo' }"
+          (click)="setActiveCategory('Todo')">
+          Todo
+        </button>
+
+        <button *ngFor="let category of categories" 
+          class="btn btn-outline-dark rounded-pill"
+          [ngClass]="{ active: activeCategory === category.nombre }" 
+          (click)="setActiveCategory(category.nombre)">
+          {{ category.nombre }}
+        </button>
+      </div>
+
+      <!-- Filtro de marcas -->
+      <div class="col-12 col-md-auto text-md-end">
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Filtrar por marca
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end overflow-y-auto shadow" style="max-height: 300px;"> <!-- Único style justificado para limitar altura del dropdown -->
+            <li>
+              <a class="dropdown-item" role="button" (click)="vista = productos">Todas las marcas</a>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li *ngFor="let marca of marcas">
+              <a class="dropdown-item" role="button" (click)="selectMarca(marca)">{{ marca.nombre }}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenedor con scroll interno para productos -->
+    <div class="flex-grow-1 overflow-y-auto overflow-x-hidden pe-2" style="min-height: 0;">
+      <div class="row g-3">
+        <!-- Cards -->
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3" *ngFor="let product of vista">
+          <div class="card h-100 shadow-sm border-0 position-relative">
+            
+            <!-- Badges flotantes -->
+            <div class="position-absolute top-0 start-0 w-100 p-2 d-flex justify-content-between pointer-events-none">
+              <span class="badge bg-danger" *ngIf="product.estado == 0">Deshabilitado</span>
+              <span class="badge bg-warning text-dark ms-auto" *ngIf="product.oferta">{{ product.oferta }}</span>
+            </div>
+
+            <!-- Imagen -->
+            <div class="p-3 text-center bg-white rounded-top">
+              <img [src]="url_store + product.imagen" class="img-fluid object-fit-contain" style="height: 180px;" alt="Producto" />
+            </div>
+
+            <div class="card-body d-flex flex-column bg-light rounded-bottom">
+              <h6 class="card-title text-truncate" [title]="product.nombre">{{ product.nombre }}</h6>
+              
+              <!-- Precios -->
+              <div class="mb-2">
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                  <span>Costo: {{ product.precioCosto | currency: "MXN" : "symbol" : "1.2-2" }}</span>
+                  <span>Negocio: {{ product.precioNegocio | currency: "MXN" : "symbol" : "1.2-2" }}</span>
+                </div>
+                <div>
+                  <span class="fs-5 fw-bold text-dark" *ngIf="!product.nuevoPrecio">
+                    {{ product.precioVenta | currency: "MXN" : "symbol" : "1.2-2" }}
+                  </span>
+                  <span class="fs-5 fw-bold text-danger" *ngIf="product.nuevoPrecio">
+                    {{ product.nuevoPrecio | currency: "MXN" : "symbol" : "1.2-2" }}
+                  </span>
+                  <small class="text-muted text-decoration-line-through ms-2" *ngIf="product.nuevoPrecio">
+                    {{ product.precioVenta | currency: "MXN" : "symbol" : "1.2-2" }}
+                  </small>
+                  <small class="text-muted ms-2" *ngIf="!product.nuevoPrecio">Público</small>
+                </div>
+              </div>
+
+              <!-- Tags de Marca y Stock al fondo de la card -->
+              <div class="d-flex justify-content-between align-items-center mt-auto mb-3">
+                <span class="badge bg-secondary text-truncate" style="max-width: 60%;" [title]="product.marca.nombre + ' - ' + product.modelo.nombre">
+                  {{ product.marca.nombre }} - {{ product.modelo.nombre }}
+                </span>
+                <span class="badge" [ngClass]="product.stock > product.stockMinimo ? 'bg-success' : 'bg-danger'">
+                  Stock: {{ product.stock }}
+                </span>
+              </div>
+
+              <!-- Botones -->
+              <div class="d-grid gap-2 mt-2">
+                <button class="btn btn-info text-white" *ngIf="isAdmin" (click)="editarProducto(product)">
+                  Editar
+                </button>
+                <button class="btn btn-secondary" *ngIf="isAdmin && product.estado == 1" (click)="updateState(product, 0)">
+                  Deshabilitar
+                </button>
+                <button class="btn btn-outline-dark" *ngIf="isAdmin && product.estado == 0" (click)="updateState(product, 1)">
+                  Habilitar
+                </button>
+                <button class="btn btn-danger" *ngIf="isAdmin" (click)="deleteProducto(product.codigoQr)">
+                  Eliminar
+                </button>
+
+                <button class="btn btn-success" *ngIf="!isAdmin && product.stock > 0" (click)="addToCart(product)">
+                  Agregar al carrito
+                </button>
+                <button class="btn btn-outline-secondary" *ngIf="!isAdmin && product.stock <= 0" disabled (click)="addToCart(product)">
+                  Agotado
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar derecho: Carrito -->
+  <div *ngIf="!isAdmin && !showNav" class="col-12 col-lg-3 bg-white border-start shadow-sm d-flex flex-column overflow-hidden h-100">
+    <!-- Encabezado del carrito -->
+    <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-light">
+      <h5 class="mb-0 fw-bold"><i class="bi bi-cart3 me-2"></i>Carrito</h5>
+      <span class="badge bg-dark rounded-pill">{{ carrito.length }}</span>
+    </div>
+
+    <!-- Lista de productos -->
+    <div class="p-3 overflow-y-auto flex-grow-1">
+      <div *ngIf="carrito.length === 0" class="text-center text-muted mt-5">
+        <p>Tu carrito está vacío</p>
+      </div>
+
+      <div *ngFor="let item of carrito" class="d-flex align-items-center mb-3 pb-3 border-bottom">
+        <img [src]="url_store + item.producto.imagen" alt="producto" width="60" class="rounded me-3 object-fit-cover shadow-sm" />
+
+        <div class="flex-grow-1 overflow-hidden">
+          <h6 class="mb-1 text-truncate" [title]="item.producto.nombre">{{ item.producto.nombre }}</h6>
+          
+          <div class="d-flex justify-content-between align-items-center mt-1">
+            <div>
+              <span class="fw-bold d-block" *ngIf="!item.producto.nuevoPrecio">
+                {{ item.producto.precioVenta | currency: "MXN" : "symbol" : "1.2-2" }}
+              </span>
+              <span class="fw-bold text-danger d-block" *ngIf="item.producto.nuevoPrecio">
+                {{ item.producto.nuevoPrecio | currency: "MXN" : "symbol" : "1.2-2" }}
+              </span>
+              <small class="text-muted text-decoration-line-through" *ngIf="item.producto.nuevoPrecio">
+                {{ item.producto.precioVenta | currency: "MXN" : "symbol" : "1.2-2" }}
+              </small>
+            </div>
+            <span class="badge bg-secondary ms-2">x{{ item.cantidad }}</span>
+          </div>
+        </div>
+
+        <button class="btn btn-outline-danger btn-sm ms-3" (click)="removeFromCart(item)" title="Eliminar">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Resumen siempre abajo -->
+    <div class="p-3 border-top bg-white mt-auto">
+      <div class="p-3 rounded bg-light border mb-3">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">Subtotal</span>
+          <span>{{ calcularSinDescuento() | currency: "MXN" : "symbol" : "1.2-2" }}</span>
+        </div>
+
+        <div class="d-flex justify-content-between mb-2 text-success">
+          <span>Descuento aplicado</span>
+          <span>- {{ calcularDescuento() | currency: "MXN" : "symbol" : "1.2-2" }}</span>
+        </div>
+
+        <hr class="my-2" />
+        <div class="d-flex justify-content-between fs-5">
+          <strong>Total</strong>
+          <strong class="text-dark">{{ calcularTotal() | currency: "MXN" : "symbol" : "1.2-2" }}</strong>
+        </div>
+      </div>
+
+      <button class="btn btn-success btn-lg w-100 fw-bold shadow-sm" (click)="finishSale()" [disabled]="carrito.length <= 0">
+        Finalizar Compra
+      </button>
+    </div>
+  </div>
+</div>
+</main>

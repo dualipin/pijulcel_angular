@@ -1,0 +1,88 @@
+<main class="d-flex" style="height: 100vh; justify-content: center; align-items: center; flex-direction: column;">
+  <form (ngSubmit)="confirmarCodigo()">
+    <div class="container py-4 text-center"
+      style="background-color: white; border: 2px solid rgb(208, 208, 208); width: 420px; border-radius: 5px;">
+      <!-- Imagen de ejemplo -->
+      <img src="assets/escaneo-de-codigo-de-barras.png" alt="Código de barras de prueba" class="img-fluid mb-3"
+        style="max-width: 120px;">
+
+      <!-- Input para escribir o escanear -->
+      <div class="input-group mb-3" style="max-width: 400px; margin: auto;">
+        <span class="input-group-text">📌</span>
+        <input type="text" class="form-control" placeholder="Escanea o escribe el código" id="codeBar"
+          [(ngModel)]="codigoBarras">
+      </div>
+
+      <button class="btn btn-success px-4" type="submit">
+        Validar código
+      </button>
+
+    </div>
+  </form>
+
+  <!-- Filtro y tabla -->
+  <div class="container mt-4">
+    <div class="card shadow-sm mb-4 bg-white" style="max-width: 320px; border: none; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+      <div class="card-body d-flex align-items-center gap-3">
+        <label for="filtroFecha" class="form-label fw-semibold mb-0 text-dark" style="display: flex; gap: 5px">
+          <i class="bi bi-calendar-week me-1 text-primary"></i> Filtrar:
+        </label>
+
+        <div class="dropdown w-100">
+          <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            {{filtroFecha}}
+          </button>
+          <ul class="dropdown-menu w-100">
+            <li><a class="dropdown-item" (click)="aplicarFiltro('Siempre')">Siempre</a></li>
+            <li><a class="dropdown-item" (click)="aplicarFiltro('Hoy')">Hoy</a></li>
+            <li><a class="dropdown-item" (click)="aplicarFiltro('Ayer')">Ayer</a></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+
+
+    <div class="table-responsive" style="max-height: 50vh; overflow-y: auto;">
+      <table class="table table-bordered table-hover table-striped align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>Fecha y Hora</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Total</th>
+            <th>Observación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entrada of entradasFiltradas">
+            <td>{{ entrada.fechaHora | date:'shortDate' }}</td>
+            <td class="d-flex align-items-center gap-2">
+              <img [src]="url_store + entrada.producto.imagen" alt="Imagen producto" class="rounded"
+                style="width: 60px; height: 60px; object-fit: cover;">
+              <div>
+                <strong>{{ entrada.producto.nombre }}</strong><br>
+                Marca: {{ entrada.producto.marca.nombre }}<br>
+                Modelo: {{ entrada.producto.modelo.nombre }}
+              </div>
+            </td>
+            <td>{{ entrada.cantidad }}</td>
+            <td>{{ entrada.precioCompra | currency:'MXN':'symbol':'1.2-2' }}</td>
+            <td>{{ entrada.precioCompra*entrada.cantidad | currency:'MXN':'symbol':'1.2-2' }}</td>
+            <td>{{ entrada.observ }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="entradasFiltradas.length === 0" class="text-center py-4 text-muted">
+      <img src="assets/caja.png" alt="Sin registros" class="img-fluid mb-3" style="max-width: 120px;">
+      <h5>No hay entradas registradas</h5>
+      <p class="mb-0">Intenta escanear un código o ajustar el filtro de fecha.</p>
+    </div>
+
+  </div>
+</main>

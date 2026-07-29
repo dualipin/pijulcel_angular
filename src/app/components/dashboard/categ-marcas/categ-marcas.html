@@ -1,0 +1,58 @@
+<main>
+
+  <div class="container mt-4">
+    <h3 class="mb-3">📂 Categorías</h3>
+    <div class="d-flex flex-wrap gap-3 mb-4">
+      <div *ngFor="let categoria of categorias">
+        <div *ngIf="categoria.cantidad_productos > 0"
+          class="categoria-pill px-3 py-2 rounded shadow-sm d-flex align-items-center">
+          <i class="bi bi-folder me-2 text-primary"></i>
+          <span>{{ categoria.nombre }}</span>
+          <span style="margin-left: 1vh; font-weight: bold;">({{categoria.cantidad_productos}})</span>
+        </div>
+        <div *ngIf="categoria.cantidad_productos <= 0" (click)="removerCategoria(categoria)"
+          class="categoria-pill-2 px-3 py-2 rounded shadow-sm d-flex align-items-center">
+          <i class="bi bi-folder me-2 text-primary"></i>
+          <span>{{ categoria.nombre }}</span>
+          <span style="margin-left: 1vh; font-weight: bold;">({{categoria.cantidad_productos}})</span>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Sección de Marcas y Modelos -->
+    <h3 class="mb-3">🏷️ Marcas y Modelos</h3>
+    <div class="row">
+      <div class="col-md-6 col-lg-4 mb-4" *ngFor="let element of marcasModelos">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title text-success">
+              <i class="bi bi-tag-fill me-2"></i>{{ element.marcas.nombre }}
+              <span class="badge rounded-pill text-bg-dark" style="margin-left: 1vh;">{{
+                element.marcas.cantidad_productos }}</span>
+            </h5>
+            <div class="d-flex" style="flex-wrap: wrap;">
+              <div *ngFor="let modelo of element.modelos">
+                <span class="badge bg-black" style="border-radius: 4px 0px 0px 4px;">
+                  {{ modelo.cantidad_productos }}
+                </span>
+                <span class="badge bg-secondary me-1" style="border-radius: 0px 4px 4px 0px;"
+                  *ngIf="modelo.cantidad_productos > 0">
+                  {{ modelo.nombre }}
+                </span>
+                <span class="badge bg-secondary me-1 remove_modelo" style="border-radius: 0px 4px 4px 0px;" *ngIf="modelo.cantidad_productos <= 0">
+                  <label (click)="removerModelo(modelo)">{{ modelo.nombre }}</label>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div style="padding: 1vh; padding-top: 0px; width: 100%;">
+            <button class="btn btn-dark" style="width: 100%;" (click)="deleteMarca(element.marcas)"
+              [disabled]="element.marcas.cantidad_productos > 0">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>

@@ -1,0 +1,63 @@
+<main class="d-flex" style="height: 100vh; justify-content: center; align-items: center; flex-direction: column;">
+  <form (ngSubmit)="confirmarCodigo()">
+    <div class="container py-4 text-center"
+      style="background-color: white; border: 2px solid rgb(208, 208, 208); width: 420px; border-radius: 5px;">
+      <!-- Input para escribir o escanear -->
+      <div class="input-group mb-3" style="max-width: 400px; margin: auto;">
+        <input type="text" class="form-control" placeholder="Escanea o escribe el folio" id="codeBar"
+          [(ngModel)]="folioTicket">
+      </div>
+
+      <button class="btn btn-success px-4" type="submit">
+        Validar folio
+      </button>
+
+    </div>
+  </form>
+
+  <div class="container mt-4">
+    <h3>Detalles de la venta</h3>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Devueltos</th>
+          <th>Precio Unitario</th>
+          <th>Descuento Unitario</th>
+          <th>Total</th>
+          <th>Devolver</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let detalle of this.venta.detalles">
+          <td class="d-flex" style="align-items: center; gap: 8px;">
+            <div>
+              <img class="imagen-producto" [src]="this.url_store + detalle.producto.imagen">
+            </div>
+            <div>
+              <strong>{{ detalle.producto.nombre }}</strong><br>
+              Marca: {{ detalle.producto.marca.nombre }}<br>
+              Categoría: {{ detalle.producto.categoria.nombre }}
+            </div>
+          </td>
+          <td class="text-center">{{ detalle.cantidad }}</td>
+          <td class="text-center">{{ detalle.devueltos }}</td>
+          <td class="text-center">{{ detalle.precioUnit | currency }}</td>
+          <td class="text-center">-{{ detalle.descuentoUnit | currency }}</td>
+          <td class="text-center">{{ (detalle.precioUnit - detalle.descuentoUnit )* detalle.cantidad | currency }}</td>
+          <td class="text-center" *ngIf="detalle.devueltos < detalle.cantidad">
+            <button class="btn btn-warning" style="width: 150px;" (click)="confirmarDevolucion(detalle)" id="btnDevolver_{{ detalle.id }}">
+              <i class="bi bi-arrow-return-left"></i> Devolver</button>
+          </td>
+          <td class="text-center" *ngIf="detalle.devueltos === detalle.cantidad">
+            <span class="text-success">Devolución completada</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="d-flex justify-content-end">
+      <h4>Total: {{ venta.venta.totalVenta | currency }}</h4>
+    </div>
+  </div>
+</main>

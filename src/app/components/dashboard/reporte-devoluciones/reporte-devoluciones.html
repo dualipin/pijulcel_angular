@@ -1,0 +1,55 @@
+<main class="d-flex" style="max-height: 100vh; overflow-y: auto; justify-content: center; align-items: center; flex-direction: column;">
+
+  <div class="container mt-3" style="padding: 5vh;">
+    <h1 class="text-center">Reporte de Devoluciones</h1>
+    <div class="card shadow-sm mb-4 bg-white"
+      style="max-width: 320px; border: none; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+      <div class="card-body d-flex align-items-center gap-3">
+        <label for="filtroFecha" class="form-label fw-semibold mb-0 text-dark" style="display: flex; gap: 5px">
+          <i class="bi bi-calendar-week me-1 text-primary"></i> Filtrar:
+        </label>
+
+        <div class="dropdown w-100">
+          <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            {{filtroFecha}}
+          </button>
+          <ul class="dropdown-menu w-100">
+            <li><a class="dropdown-item" (click)="aplicarFiltro('Siempre')">Siempre</a></li>
+            <li><a class="dropdown-item" (click)="aplicarFiltro('Hoy')">Hoy</a></li>
+            <li><a class="dropdown-item" (click)="aplicarFiltro('Ayer')">Ayer</a></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+    <table class="table table-bordered table-striped mt-3">
+      <thead class="table-dark">
+        <tr>
+          <th>Fecha</th>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Monto Reembolsado</th>
+          <th>Motivo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of devFiltradas">
+          <td class="text-center">{{ d.fechaHora | date:'dd/MM/yyyy HH:mm a' }}</td>
+          <td>{{ d.producto.nombre }}</td>
+          <td class="text-center">{{ d.cantidad }}</td>
+          <td class="text-center">${{ d.montoReembolsado }}</td>
+          <td class="text-center">{{ d.motivo }}</td>
+          <td class="text-center" *ngIf="d.estado === 1">
+            <button class="btn btn-sm btn-dark" (click)="reabastecer(d)">Reabastecer</button>
+          </td>
+          <td class="text-center" *ngIf="d.estado === 2">
+            <button class="btn btn-sm btn-dark" disabled>Reabastecido</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>

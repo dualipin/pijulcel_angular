@@ -1,0 +1,122 @@
+<div style="padding: 4vh;">
+  <div class="container bg-white rounded shadow-sm p-4">
+    <div class="row align-items-center mb-4">
+      <!-- Logo -->
+      <div class="col-md-2 text-center">
+        <img [src]="negocio.logo_path" alt="Logo" class="img-fluid rounded"
+          style="max-height: 80px; object-fit: contain;">
+      </div>
+
+      <!-- Nombre del negocio -->
+      <div class="col-md-10">
+        <h4 class="fw-bold text-primary mb-0">{{ negocio.nombre }}</h4>
+        <small class="text-muted">RFC: {{ negocio.rfc }}</small>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Dirección -->
+      <div class="col-md-6 mb-3">
+        <label class="form-label fw-semibold">📍 Dirección</label>
+        <div class="form-control bg-light">{{ negocio.direccion }}</div>
+      </div>
+
+      <!-- Teléfono -->
+      <div class="col-md-6 mb-3">
+        <label class="form-label fw-semibold">📞 Teléfono</label>
+        <div class="form-control bg-light">{{ negocio.telefono }}</div>
+      </div>
+    </div>
+
+    <!-- Botón de edición (opcional) -->
+    <div class="d-flex text-end mt-3" style="gap: 5px;">
+      <div class="d-flex" style="width: 50%; justify-content: start;">
+        <button class="btn btn-secondary d-inline-flex align-items-center gap-2" (click)="backup()"
+          [disabled]="isLoading">
+
+          <!-- Ícono normal -->
+          <ng-container *ngIf="!isLoading">
+            <i class="bi bi-database-fill-down"></i> Copia de seguridad
+          </ng-container>
+
+          <!-- Estado cargando -->
+          <ng-container *ngIf="isLoading">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Generando...
+          </ng-container>
+        </button>
+
+      </div>
+      <input type="file" #fileInput (change)="onFileSelected($event)" hidden />
+
+      <!-- Botón seleccionar archivo -->
+      <button class="btn btn-success d-inline-flex align-items-center gap-2" (click)="fileInput.click()"
+        *ngIf="!isLoading_upload">
+        <i class="bi bi-database-fill-up"></i> Subir .ZIP
+      </button>
+
+      <!-- Botón restaurar -->
+      <button class="btn btn-success d-inline-flex align-items-center gap-2" (click)="restore()" *ngIf="selectedFile"
+        [disabled]="isLoading_upload">
+
+        <!-- Texto normal -->
+        <ng-container *ngIf="!isLoading_upload && selectedFile">
+          <i class="bi bi-database-fill-up"></i> Restaurar Base de datos
+        </ng-container>
+
+        <!-- Estado cargando -->
+        <ng-container *ngIf="isLoading_upload">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Restaurando...
+        </ng-container>
+      </button>
+
+    </div>
+  </div>
+
+  <div class="container mt-4" style="border-radius: 6px; background-color: white;">
+    <div class="d-flex p-2">
+      <div class="d-flex" style="width: 50%;">
+        <h3 class="mb-3">Lista de Usuarios</h3>
+      </div>
+      <div class="d-flex" style="width: 50%; justify-content: end;">
+        <button class="btn btn-outline-secondary" (click)="createUser()"><i class="bi bi-person-fill-add"></i> Nuevo
+          usuario</button>
+      </div>
+    </div>
+    <table class="table table-hover table-bordered">
+      <thead class="table-light">
+        <tr>
+          <th>Username</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td *ngIf="user.userName !== my_username">{{ user.userName }}</td>
+          <td *ngIf="user.userName === my_username">{{ user.userName +" (yo) "}}</td>
+          <td>
+            <select class="form-select form-select-sm" [(ngModel)]="user.rol"
+              [disabled]="user.userName === my_username">
+              <option value="1">Admin</option>
+              <option value="0">Cajero</option>
+            </select>
+          </td>
+          <td>
+            <span [ngClass]="{'text-success': user.activo, 'text-danger': !user.activo}">
+              {{ user.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-danger btn-sm" [disabled]="user.userName === my_username" (click)="deleteUser(user)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

@@ -1,0 +1,109 @@
+<main>
+  <div class="sidebar d-flex flex-column" *ngIf="showNav">
+    <div class="d-flex" style="padding-bottom: 25px; width: 100%; justify-content: center;">
+      <img [src]="negocio.logo_path" alt="Logo" height="80px">
+    </div>
+
+    <ul class="nav flex-column px-3">
+
+      <label class="h_lbl">Catálogo de Productos</label>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/dashboard/list-products']">
+          <i class="bi bi-box-seam-fill"></i><label class="lbl_sidebar">Ver productos</label>
+        </a>
+      </li>
+
+      <li class="nav-item" *ngIf="!isAdmin">
+        <a class="nav-link" [routerLink]="['/dashboard/reporte-ventas']">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff">
+            <path
+              d="M320-414v-306h120v306l-60-56-60 56Zm200 60v-526h120v406L520-354ZM120-216v-344h120v224L120-216Zm0 98 258-258 142 122 224-224h-64v-80h200v200h-80v-64L524-146 382-268 232-118H120Z" />
+          </svg>
+          <label class="lbl_sidebar">Historial de ventas</label>
+        </a>
+      </li>
+
+      <li class="nav-item" *ngIf="!isAdmin">
+        <a class="nav-link" [routerLink]="['/dashboard/devoluciones']">
+          <i class="bi bi-arrow-return-left"></i><label class="lbl_sidebar">Devoluciones</label>
+        </a>
+      </li>
+
+      <li class="nav-item" *ngIf="isAdmin">
+        <a class="nav-link" [routerLink]="['/dashboard/register-product']">
+          <i class="bi bi-plus-square-fill"></i><label class="lbl_sidebar">Registrar producto</label>
+        </a>
+      </li>
+
+      <li class="nav-item" *ngIf="isAdmin">
+        <a class="nav-link" [routerLink]="['/dashboard/descuentos']">
+          <i class="bi bi-calendar2-date-fill"></i><label class="lbl_sidebar">Ofertas/Descuentos</label>
+        </a>
+      </li>
+
+      <li class="nav-item" *ngIf="isAdmin">
+        <a class="nav-link" [routerLink]="['/dashboard/categorias-marcas']">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+            <path
+              d="m260-520 220-360 220 360H260ZM700-80q-75 0-127.5-52.5T520-260q0-75 52.5-127.5T700-440q75 0 127.5 52.5T880-260q0 75-52.5 127.5T700-80Zm-580-20v-320h320v320H120Zm580-60q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Zm-500-20h160v-160H200v160Zm202-420h156l-78-126-78 126Zm78 0ZM360-340Zm340 80Z" />
+          </svg><label class="lbl_sidebar">Categorías y Marcas</label>
+        </a>
+      </li>
+
+
+
+      <label class="h_lbl" *ngIf="isAdmin">Compras y Ventas</label>
+
+      <li class="nav-item" *ngIf="isAdmin">
+        <a class="nav-link" [routerLink]="['/dashboard/register-entry']">
+          <i class="bi bi-archive-fill"></i><label class="lbl_sidebar">Registrar entrada</label>
+        </a>
+      </li>
+
+      <li class="nav-item" *ngIf="isAdmin">
+        <a class="nav-link" [routerLink]="['/dashboard/imprimir-qr']">
+          <i class="bi bi-upc-scan"></i><label class="lbl_sidebar">Imprimir tickets</label>
+        </a>
+      </li>
+
+      <li class="nav-item" *ngIf="isAdmin">
+        <a class="nav-link" [routerLink]="['/dashboard/reporte-ventas']">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff">
+            <path
+              d="M320-414v-306h120v306l-60-56-60 56Zm200 60v-526h120v406L520-354ZM120-216v-344h120v224L120-216Zm0 98 258-258 142 122 224-224h-64v-80h200v200h-80v-64L524-146 382-268 232-118H120Z" />
+          </svg>
+          <label class="lbl_sidebar">Reporte de ventas</label>
+        </a>
+      </li>
+
+      <li class="nav-item" *ngIf="isAdmin">
+        <a class="nav-link" [routerLink]="['/dashboard/reporte-devoluciones']">
+          <i class="bi bi-arrow-return-left"></i><label class="lbl_sidebar">Reporte de devoluciones</label>
+        </a>
+      </li>
+
+
+
+      <label class="h_lbl" *ngIf="isAdmin">Configuración</label>
+      <li class="nav-item" *ngIf="isAdmin">
+        <a class="nav-link" [routerLink]="['/dashboard/config-negocio']">
+          <i class="bi bi-shop-window"></i>
+          <label class="lbl_sidebar">Mi negocio</label>
+        </a>
+      </li>
+
+      <li class="nav-item" style="margin-bottom: 40px; margin-top: 40px;">
+        <a class="d-flex nav-link" (click)="cerrarSesion()"
+          style="background-color: #495057; justify-content: center; padding-left: 0px;">
+          <i class="bi bi-box-arrow-left"></i><label class="lbl_sidebar">Cerrar sesión</label>
+        </a>
+      </li>
+
+
+    </ul>
+  </div>
+  <div class="bodyContent">
+    <!-- dashboard.component.html -->
+    <router-outlet />
+  </div>
+</main>
